@@ -3,23 +3,22 @@
 # telnet至Windows机并删除api的jar包文件夹
 
 import telnetlib
-import os
 
 ''' telnet至Windows机并删除api的jar包文件夹 '''
 
 # 配置选项
-Host = '192.168.1.200'      # 打包机IP
+Host = '192.168.1.200'      # IP地址
 username = 'Administrator' # 登录用户名
 password = '1'             # 登录密码
 finish = '>'               # 提示符
-jarpath = 'E:\sonatype-work\nexus\storage\releases\com\ideal\mdm-api\2.0.2-RELEASE'
+jarpath = 'E:\sonatype-work\nexus\storage\releases\com\test\api\2.0.2-RELEASE'
 
-# 连接打包机
+# 连接
 tn = telnetlib.Telnet(Host)
 
 # 输入登录用户名
 #tn.read_until('Welcome to Microsoft Telnet Service\r\n')
-tn.read_until('login:')
+tn.read_until('login:')       # Win7 登录
 tn.write(username + '\r\n')
 
 # 输入登录密码
