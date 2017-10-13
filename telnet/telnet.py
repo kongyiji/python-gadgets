@@ -7,7 +7,7 @@ import telnetlib
 ''' telnet至Windows机并删除api的jar包文件夹 '''
 
 # 配置选项
-Host = '192.168.1.200'      # IP地址
+Host = '192.168.1.200'     # IP地址
 username = 'Administrator' # 登录用户名
 password = '1'             # 登录密码
 finish = '>'               # 提示符
