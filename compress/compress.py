@@ -17,7 +17,7 @@ class compress_info(object):
 
     # read configiure into mem
     def read_config(self):
-        self.config.read(self.file)
+        self.config.read(self.file, encoding='utf-8')
 
     # get all sections, except 'DEFAULT'
     def get_section(self):
