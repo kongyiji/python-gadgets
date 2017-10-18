@@ -33,12 +33,16 @@ class compress_info(object):
         return self.config.get(section, 'BackupPath') + os.sep + str_today
 
 def compress(srcpath, zipfilename):
+    'compress source files to zipfilename'
+
+    # open file
     with ZipFile(zipfilename, 'w') as zf:
+        # traseval all path in source path
         for root, dirnames, filenames in os.walk(srcpath):
+            # define relative directory
             relroot = os.path.relpath(root, start=os.path.dirname(srcpath))
-            # print(relroot)
+            # compress all files in relative directory
             for filename in filenames:
-                # print(os.path.join(root, filename))
                 zf.write(os.path.join(root, filename), arcname=os.path.join(relroot, filename))
 
 if __name__ == '__main__':
@@ -46,11 +50,23 @@ if __name__ == '__main__':
     ini = compress_info('config.ini')
     ini.read_config()
     sections = ini.get_section()
+
+    # compress every section
     for section in sections:
+        # get path infomation from ini file
         srcpath = ini.get_srcpath(section)
         despath = ini.get_despath(section)
         zipfilename = despath + os.sep + section + '.zip'
-        os.chdir(srcpath)
-        # print(srcpath, despath, zipfilename)
-        compress(srcpath, zipfilename)
-    # print(sections, srcpaths, despaths)
+
+        # check Source file exists or not
+        if not os.path.exists(srcpath):
+            print(section + ' Not Exists')
+
+        # check Backup directory exists or not
+        # Backup exists, compress
+        if os.path.exists(despath):
+            compress(srcpath, zipfilename)
+        else:
+            # Backup not exists, create directory and compress
+            os.makedirs(despath)
+            compress(srcpath, zipfilename)
