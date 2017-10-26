@@ -7,6 +7,7 @@ from datetime import date
 from zipfile import ZipFile
 from configparser import ConfigParser
 
+
 class compress_info(object):
     '''get information'''
 
@@ -32,6 +33,7 @@ class compress_info(object):
         str_today = date.today().strftime('%Y%m%d')
         return self.config.get(section, 'BackupPath') + os.sep + str_today
 
+
 def compress(srcpath, zipfilename):
     'compress source files to zipfilename'
 
@@ -44,6 +46,7 @@ def compress(srcpath, zipfilename):
             # compress all files in relative directory
             for filename in filenames:
                 zf.write(os.path.join(root, filename), arcname=os.path.join(relroot, filename))
+
 
 if __name__ == '__main__':
     # get paths which need to compress
