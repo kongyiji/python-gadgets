@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # platform: python3
 
+# __author__ = Kong Yiji
+
 import os
 from datetime import date
 from zipfile import ZipFile
