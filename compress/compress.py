@@ -5,6 +5,7 @@
 # __author__ = Kong Yiji
 
 import os
+import chardet
 from datetime import date
 from zipfile import ZipFile
 from configparser import ConfigParser
@@ -20,7 +21,10 @@ class compress_info(object):
 
     # read configiure into mem
     def read_config(self):
-        self.config.read(self.file, encoding='utf-8')
+        with open(self.file, 'rb') as f:
+            cache = f.read()
+            filecode = chardet.detect(cache)['encoding']
+        self.config.read(self.file, encoding=filecode)
 
     # get all sections, except 'DEFAULT'
     def get_section(self):
