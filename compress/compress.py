@@ -6,9 +6,10 @@
 
 import os
 import chardet
+import subprocess
 from datetime import date
 from zipfile import ZipFile
-from configparser import ConfigParser
+from configparser import ConfigParser, NoOptionError
 
 
 class compress_info(object):
@@ -39,6 +40,10 @@ class compress_info(object):
         str_today = date.today().strftime('%Y%m%d')
         return self.config.get(section, 'BackupPath') + os.sep + str_today
 
+    # get winrar path
+    def get_rarpath(self, section):
+        return self.config.get(section, 'RARPath')
+
 
 def compress(srcpath, zipfilename):
     'compress source files to zipfilename'
@@ -54,11 +59,27 @@ def compress(srcpath, zipfilename):
                 zf.write(os.path.join(root, filename), arcname=os.path.join(relroot, filename))
 
 
+def compress_rar(rarpath, rarfilename, srcpath):
+    '''compress source files to rarfilename'''
+
+    #abspath = os.path.join(srcpath, relpath)
+    rar_command = '"%s" a -ep1 -r -m5 -ma5 "%s" "%s"' % (rarpath, rarfilename, srcpath)
+    subprocess.call(rar_command)
+
+
 if __name__ == '__main__':
+    # Initailize
+    rarpath = None
+
     # get paths which need to compress
     ini = compress_info('config.ini')
     ini.read_config()
     sections = ini.get_section()
+    # if exists, get WinRAR path
+    try:
+        rarpath = ini.get_rarpath('DEFAULT') + os.sep + 'Rar.exe'
+    except NoOptionError as e:
+        pass
 
     # compress every section
     for section in sections:
@@ -66,16 +87,29 @@ if __name__ == '__main__':
         srcpath = ini.get_srcpath(section)
         despath = ini.get_despath(section)
         zipfilename = despath + os.sep + section + '.zip'
+        rarfilename = despath + os.sep + section + '.rar'
 
         # check Source file exists or not
         if not os.path.exists(srcpath):
             print(section + ' Not Exists')
 
-        # check Backup directory exists or not
-        # Backup exists, compress
-        if os.path.exists(despath):
-            compress(srcpath, zipfilename)
+        # check use Winrar or not to compress
+        if rarpath:
+            # check Backup directory exists or not
+            # Backup exists, compress
+            if os.path.exists(despath):
+                compress_rar(rarpath, rarfilename, srcpath)
+            else:
+                # Backup not exists, create directory and compress
+                os.makedirs(despath)
+                compress_rar(rarpath, rarfilename, srcpath)
         else:
-            # Backup not exists, create directory and compress
-            os.makedirs(despath)
-            compress(srcpath, zipfilename)
+            # check Backup directory exists or not
+            # Backup exists, compress
+            if os.path.exists(despath):
+                compress(srcpath, zipfilename)
+            else:
+                # Backup not exists, create directory and compress
+                os.makedirs(despath)
+                compress(srcpath, zipfilename)
+
