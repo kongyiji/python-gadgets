@@ -13,7 +13,7 @@ from configparser import ConfigParser, NoOptionError
 
 
 class compress_info(object):
-    '''get information'''
+    """get information"""
 
     # Initialization
     def __init__(self, file):
@@ -46,7 +46,7 @@ class compress_info(object):
 
 
 def compress(srcpath, zipfilename):
-    'compress source files to zipfilename'
+    """compress source files to zipfilename"""
 
     # open file
     with ZipFile(zipfilename, 'w') as zf:
@@ -60,14 +60,14 @@ def compress(srcpath, zipfilename):
 
 
 def compress_rar(rarpath, rarfilename, srcpath):
-    '''compress source files to rarfilename'''
+    """compress source files to rarfilename"""
 
-    #abspath = os.path.join(srcpath, relpath)
+    # abspath = os.path.join(srcpath, relpath)
     rar_command = '"%s" a -ep1 -r -m5 -ma5 "%s" "%s"' % (rarpath, rarfilename, srcpath)
     subprocess.call(rar_command)
 
 
-if __name__ == '__main__':
+def main():
     # Initailize
     rarpath = None
 
@@ -113,3 +113,6 @@ if __name__ == '__main__':
                 os.makedirs(despath)
                 compress(srcpath, zipfilename)
 
+
+if __name__ == '__main__':
+    main()
