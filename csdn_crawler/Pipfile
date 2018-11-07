@@ -1,0 +1,13 @@
+[[source]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+"bs4" = "*"
+
+[dev-packages]
+"goose3" = "*"
+
+[requires]
+python_version = "3.6"
