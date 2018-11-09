@@ -5,9 +5,10 @@ name = "pypi"
 
 [packages]
 "bs4" = "*"
+requests = "*"
 
 [dev-packages]
-"goose3" = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.6"
