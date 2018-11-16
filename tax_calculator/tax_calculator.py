@@ -2,7 +2,7 @@
 
 deduct_insurance = eval(input('请输入缴纳五险一金后的工资：'))
 threshold = 5000
-money = deduct_insurance - 5000
+money = deduct_insurance - threshold
 tax = 0
 
 calc_tables = (
