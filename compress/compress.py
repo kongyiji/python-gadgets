@@ -5,13 +5,14 @@
 # __author__ = Kong Yiji
 
 import os
+import zlib
+import zipfile
 import tarfile
 import chardet
 import subprocess
 from logger import log
 from pathlib import Path
 from datetime import date
-from zipfile import ZipFile
 from configparser import ConfigParser, NoOptionError
 
 compress_log = log('compress')
@@ -54,9 +55,9 @@ def compress(srcpath, zipfilename):
     """compress source files to zipfile name"""
 
     # open file
-    with ZipFile(zipfilename, 'w') as zf:
+    with zipfile.ZipFile(zipfilename, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
         # search all path in source path
-        for root, dirnames, filenames in os.walk(srcpath):
+        for root, _, filenames in os.walk(srcpath):
             # define relative directory
             relroot = os.path.relpath(root, start=os.path.dirname(srcpath))
             # compress all files in relative directory
@@ -79,10 +80,11 @@ def compress_rar(rarpath, rarfilename, srcpath):
     compress_log.info('compressing directory [%s] to [%s]' % (srcpath, rarfilename))
 
 def compress_targz(srcpath, targzfilename):
-    with tarfile.open(targzfilename, 'w:gz') as t:
+    with tarfile.open(targzfilename, 'w|gz', format=tarfile.USTAR_FORMAT) as t:
         filenames = Path(srcpath).glob('**/*')
         for filename in filenames:
-            t.add(filename, arcname='/')
+            print(filename)
+            t.add(filename)
             compress_log.info('compressing file [%s] to [%s]' % (filename, targzfilename))
 
 
@@ -107,8 +109,8 @@ def main():
         # get path information from ini file
         srcpath = ini.get_srcpath(section)
         despath = ini.get_despath(section)
-        # zipfilename = despath + os.sep + section + '.zip'
-        targzfilename = despath + os.sep + section + '.tar.gz'
+        zipfilename = despath + os.sep + section + '.zip'
+        # targzfilename = despath + os.sep + section + '.tar.gz'
         rarfilename = despath + os.sep + section + '.rar'
 
         # check Source file exists or not
@@ -131,13 +133,13 @@ def main():
             # check Backup directory exists or not
             # Backup exists, compress
             if os.path.exists(despath):
-                # compress(srcpath, zipfilename)
-                compress_targz(srcpath, targzfilename)
+                compress(srcpath, zipfilename)
+                # compress_targz(srcpath, targzfilename)
             else:
                 # Backup not exists, create directory and compress
                 os.makedirs(despath)
-                # compress(srcpath, zipfilename)
-                compress_targz(srcpath, targzfilename)
+                compress(srcpath, zipfilename)
+                # compress_targz(srcpath, targzfilename)
 
 
 if __name__ == '__main__':
