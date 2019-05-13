@@ -5,9 +5,11 @@
 # __author__ = Kong Yiji
 
 import os
+import tarfile
 import chardet
 import subprocess
 from logger import log
+from pathlib import Path
 from datetime import date
 from zipfile import ZipFile
 from configparser import ConfigParser, NoOptionError
@@ -76,6 +78,13 @@ def compress_rar(rarpath, rarfilename, srcpath):
     subprocess.call(rar_command)
     compress_log.info('compressing directory [%s] to [%s]' % (srcpath, rarfilename))
 
+def compress_targz(srcpath, targzfilename):
+    with tarfile.open(targzfilename, 'w:gz') as t:
+        filenames = Path(srcpath).glob('**/*')
+        for filename in filenames:
+            t.add(filename, arcname='/')
+            compress_log.info('compressing file [%s] to [%s]' % (filename, targzfilename))
+
 
 def main():
     # Initailize
@@ -90,14 +99,16 @@ def main():
         rarpath = ini.get_rarpath('DEFAULT') + os.sep + 'Rar.exe'
         compress_log.info('compress with RAR format')
     except NoOptionError as e:
-        compress_log.info('compress with ZIP format')
+        # compress_log.info('compress with ZIP format')
+        compress_log.info('compress with tar.gz format')
 
     # compress every section
     for section in sections:
         # get path information from ini file
         srcpath = ini.get_srcpath(section)
         despath = ini.get_despath(section)
-        zipfilename = despath + os.sep + section + '.zip'
+        # zipfilename = despath + os.sep + section + '.zip'
+        targzfilename = despath + os.sep + section + '.tar.gz'
         rarfilename = despath + os.sep + section + '.rar'
 
         # check Source file exists or not
@@ -120,11 +131,13 @@ def main():
             # check Backup directory exists or not
             # Backup exists, compress
             if os.path.exists(despath):
-                compress(srcpath, zipfilename)
+                # compress(srcpath, zipfilename)
+                compress_targz(srcpath, targzfilename)
             else:
                 # Backup not exists, create directory and compress
                 os.makedirs(despath)
-                compress(srcpath, zipfilename)
+                # compress(srcpath, zipfilename)
+                compress_targz(srcpath, targzfilename)
 
 
 if __name__ == '__main__':
